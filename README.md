@@ -173,6 +173,32 @@ Evaluated using [`lm-evaluation-harness`](https://github.com/EleutherAI/lm-evalu
 **About the -0.38% ARC drop after DPO:**
 This is completely expected and has a name — the **alignment tax**. When you align a model to prefer honest, safe responses, it sometimes trades a tiny amount of raw task accuracy for better judgment. The TruthfulQA improvement (+0.61%) confirms DPO is doing exactly what it should — making the model more truthful.
 
+### LLM-as-Judge Evaluation (Gemini 2.5 Flash)
+
+In addition to standard benchmarks, I ran a custom evaluation using **Gemini 2.5 Flash as an AI judge** — a technique where a more powerful LLM scores the outputs of the models being evaluated. This is a modern alternative to human evaluation and is how many industry teams evaluate LLMs when human annotation is expensive.
+
+The judge scored each model's response on 5 criteria:
+- **Correctness** — is the answer factually right?
+- **Clarity** — is it easy to understand?
+- **Relevance** — does it actually answer the question?
+- **Conciseness** — is it appropriately brief?
+- **Instruction-following** — did it follow the format/constraints given?
+
+Tested on 5 instruction-following prompts with strict formatting constraints (e.g. "explain in exactly 2 lines", "give only 3 bullet points").
+
+| Model | Avg Score (out of 10) |
+|---|---|
+| Base LLaMA 3.2-1B | 4.80 |
+| + SFT | 7.60 |
+| **+ DPO** | **8.00** |
+
+**Win rates:**
+- SFT beats Base: 60% of prompts
+- DPO beats Base: 60% of prompts
+- DPO beats SFT: 20% of prompts
+
+The jump from **4.80 → 8.00** between Base and DPO shows the fine-tuning pipeline significantly improved instruction-following and response quality. The DPO model's edge over SFT (20% win rate) is modest but consistent with what the TruthfulQA benchmark also showed — DPO adds a small but meaningful quality improvement on top of SFT.
+
 ---
 
 ## Deployment
